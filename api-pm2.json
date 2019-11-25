@@ -1,0 +1,12 @@
+{
+  "apps" : [
+    {
+      "name"        : "pdf-express",
+      "script"      : "./src/server.js",
+      "env": {
+        "TZ": "America/Sao_Paulo"
+      },
+      "log_date_format" : "DD-MM-YYYY HH:mm Z"
+    }
+  ]
+}

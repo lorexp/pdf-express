@@ -28,7 +28,7 @@ function pdf_generator(res, capital, lucros, saques, usuario){
     //Nome do cliente
     doc.fontSize(20);
     doc.moveDown(3.5);
-    doc.text('CLIENTE: ' + usuario.nome.toUpperCase, {align: 'center'}); //130, 150
+    doc.text('CLIENTE: ' + usuario.nome.toUpperCase(), {align: 'center'}); //130, 150
 
     //Retângulo dourado com o mês de fechamento
     doc.rect(0, 180, doc.page.width, 30).fill('#D1AC00');

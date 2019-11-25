@@ -1,2 +1,9 @@
+# Directories
 /node_modules
+
+# Lock Files
+yarn.lock
+package-lock.json
+
+# PDF Files
 *.pdf
