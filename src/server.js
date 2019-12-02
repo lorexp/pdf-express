@@ -19,9 +19,9 @@ app.use(cors());
 
 app.post("/pdf", (req, res) => {
   let { capital, lucros, saques, usuario, chartP, chartR } = req.body;
-  let result = lucros.filter(lcr => moment(lcr.data, "DD/MM/YYYY").month() === moment().month());
+  //let result = lucros.filter(lcr => moment(lcr.data, "DD/MM/YYYY").month() === moment().month());
 
-  pdf_generator(res, capital, result, saques, usuario, chartP, chartR);
+  pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR);
 });
 
 app.listen(5003, "0.0.0.0", () => console.log("Listening..."));
