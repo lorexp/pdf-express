@@ -139,7 +139,38 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
     });
   }
 
-  // Criação da terceira página
+  //incluindo os gráficos no pdf - terceira página
+
+  doc.addPage();
+  //Adicionando a imagem no topo da página
+  doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+    fit: [320, 320]
+  });
+
+  //Retângulo dourado com o mês de fechamento
+  doc.rect(0, 180, doc.page.width, 30).fill("#D1AC00");
+  doc.fill("#000000");
+  doc.fontSize(25);
+  doc.moveDown(4);
+  doc.text(fechamento, { align: "center" });
+
+  //Caixa onde vão os dados
+  doc.rect(20, 230, doc.page.width - 40, doc.page.height - 270).fillAndStroke("#ffffff", "#D1AC00");
+
+  //Grafico Rentabilidade
+  doc.image(chartP, 50, 250, {
+    fit: [500, 400]
+  });
+
+  //Faixa abaixo do primeiro grafico
+  doc.rect(50, 510, doc.page.width - 100, 0.5).fillAndStroke("#D1AC00", "#D1AC00");
+
+  //Grafico ROI
+  doc.image(chartR, 50, 550, {
+    fit: [500, 400]
+  });
+
+  // Criação da quarta página
   if (saques.length > 0) {
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
@@ -191,37 +222,6 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       doc.moveDown(0.7);
     });
   }
-
-  //incluindo os gráficos no pdf
-
-  doc.addPage();
-  //Adicionando a imagem no topo da página
-  doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
-    fit: [320, 320]
-  });
-
-  //Retângulo dourado com o mês de fechamento
-  doc.rect(0, 180, doc.page.width, 30).fill("#D1AC00");
-  doc.fill("#000000");
-  doc.fontSize(25);
-  doc.moveDown(4);
-  doc.text(fechamento, { align: "center" });
-
-  //Caixa onde vão os dados
-  doc.rect(20, 230, doc.page.width - 40, doc.page.height - 270).fillAndStroke("#ffffff", "#D1AC00");
-
-  //Grafico Rentabilidade
-  doc.image(chartP, 50, 250, {
-    fit: [500, 400]
-  });
-
-  //Faixa abaixo do primeiro grafico
-  doc.rect(50, 510, doc.page.width - 100, 0.5).fillAndStroke("#D1AC00", "#D1AC00");
-
-  //Grafico ROI
-  doc.image(chartR, 50, 550, {
-    fit: [500, 400]
-  });
 
   // Finalize PDF file
   doc.end();
