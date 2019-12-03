@@ -91,7 +91,20 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.text("CAPITAL INICIAL + LUCRO", { align: "center" });
 
   // Criação da segunda página
-  if (lucros.length > 0) {
+  //ajustando a quantidade de páginas
+  let qtd_pages = lucros.length / 10;
+  let diff = qtd_pages % 1;
+  qtd_pages = qtd_pages + 1 - diff;
+  for (let i = 0; i < qtd_pages; i++) {
+    if (lucros.length > 10) {
+      itens_por_pagina = 10;
+    } else {
+      if (lucros.length === 0) {
+        break;
+      } else {
+        itens_por_pagina = lucros.length;
+      }
+    }
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
     doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
@@ -115,18 +128,18 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
     doc.fontSize(14);
     doc.moveDown(1.5);
 
-    lucros.forEach((item, index) => {
+    for (let x = 0; x < itens_por_pagina; x++) {
       doc.fill("#000000");
-      doc.text(item.data, { continued: true, align: "left" });
-      if (item.lucro >= 0) {
-        doc.text(cf.format(item.lucro, { code: "BRL" }), { continued: true, align: "right" }).fill("green");
+      doc.text(lucros[x].data, { continued: true, align: "left" });
+      if (lucros[x].lucro >= 0) {
+        doc.fillColor("green").text(cf.format(lucros[x].lucro, { code: "BRL" }), { continued: true, align: "right" });
       } else {
-        doc.text(cf.format(item.lucro, { code: "BRL" }), { continued: true, align: "right" }).fill("red");
+        doc.fillColor("red").text(cf.format(lucros[x].lucro, { code: "BRL" }), { continued: true, align: "right" });
       }
       doc.fill("#000000");
-      doc.text(item.mercado, { lineBreak: true, align: "justify" });
+      doc.text(lucros[x].mercado, { lineBreak: true, align: "justify" });
 
-      if (index !== lucros.length - 1) {
+      if (x !== itens_por_pagina - 1) {
         doc.fill("#adadad");
         doc.text("__________________________________________________________", {
           align: "left",
@@ -136,7 +149,8 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       }
 
       doc.moveDown(0.7);
-    });
+    }
+    lucros = lucros.slice(10, lucros.length);
   }
 
   //incluindo os gráficos no pdf - terceira página
@@ -171,7 +185,19 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   });
 
   // Criação da quarta página
-  if (saques.length > 0) {
+  qtd_pages = saques.length / 10;
+  diff = qtd_pages % 1;
+  qtd_pages = qtd_pages + 1 - diff;
+  for (let i = 0; i < qtd_pages; i++) {
+    if (saques.length > 10) {
+      itens_por_pagina = 10;
+    } else {
+      if (saques.length === 0) {
+        break;
+      } else {
+        itens_por_pagina = saques.length;
+      }
+    }
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
     doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
@@ -185,7 +211,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
     doc.moveDown(4);
     doc.text(fechamento, { align: "center" }); //130, 190
 
-    //Caixa onde vão os dados
+    //margem da página
     doc.rect(20, 230, doc.page.width - 40, doc.page.height - 270).fillAndStroke("#ffffff", "#D1AC00");
 
     doc.fill("#000000");
@@ -201,16 +227,14 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
 
     doc.moveDown(1.5);
 
-    space = 350;
-
-    saques.forEach((item, index) => {
+    for (let x = 0; x < itens_por_pagina; x++) {
       doc.fontSize(14);
       doc.fill("#000000");
-      doc.text(item.data, { continued: true, align: "left" });
-      doc.text(cf.format(item.saque, { code: "BRL" }), { continued: true, align: "center" });
-      doc.text(cf.format(item.aplicacao, { code: "BRL" }), { lineBreak: true, align: "right" });
+      doc.text(saques[x].data, { continued: true, align: "left" });
+      doc.text(cf.format(saques[x].saque, { code: "BRL" }), { continued: true, align: "center" });
+      doc.text(cf.format(saques[x].aplicacao, { code: "BRL" }), { lineBreak: true, align: "right" });
 
-      if (index !== saques.length - 1) {
+      if (x !== itens_por_pagina - 1) {
         doc.fill("#adadad");
         doc.text("__________________________________________________________", {
           align: "left",
@@ -220,8 +244,57 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       }
 
       doc.moveDown(0.7);
-    });
+    }
+    saques = saques.slice(10, saques.length);
   }
+  // if (saques.length > 0) {
+  //   doc.addPage();
+  //   //Adicionando a imagem no centro e topo da página
+  //   doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+  //     fit: [320, 320]
+  //   });
+
+  //   //Retângulo dourado com o mês de fechamento
+  //   doc.rect(0, 180, doc.page.width, 30).fill("#D1AC00");
+  //   doc.fill("#000000");
+  //   doc.fontSize(25);
+  //   doc.moveDown(4);
+  //   doc.text(fechamento, { align: "center" }); //130, 190
+
+  //   //Caixa onde vão os dados
+  //   doc.rect(20, 230, doc.page.width - 40, doc.page.height - 270).fillAndStroke("#ffffff", "#D1AC00");
+
+  //   doc.fill("#000000");
+  //   doc.moveDown(2);
+  //   doc.text("SAQUES/APLICAÇÕES", { align: "center" });
+  //   //Itens do array
+  //   doc.fontSize(14);
+  //   doc.moveDown(1.5);
+
+  //   doc.text("DATA", { align: "left", continued: true });
+  //   doc.text("SAQUES", 270, 325, { width: 20, continued: true });
+  //   doc.text("APLICAÇÃO", 360, 325, { lineBreak: true });
+
+  //   doc.moveDown(1.5);
+
+  //   saques.forEach((item, index) => {
+  //     doc.fontSize(14);
+  //     doc.fill("#000000");
+  //     doc.text(item.data, { continued: true, align: "left" });
+  //     doc.text(cf.format(item.saque, { code: "BRL" }), { continued: true, align: "center" });
+  //     doc.text(cf.format(item.aplicacao, { code: "BRL" }), { lineBreak: true, align: "right" });
+
+  //     if (index !== saques.length - 1) {
+  //       doc.fill("#adadad");
+  //       doc.text("__________________________________________________________", {
+  //         align: "left",
+  //         width: doc.page.width,
+  //         lineBreak: true
+  //       });
+  //     }
+
+  //     doc.moveDown(0.7);
+  //   });
 
   // Finalize PDF file
   doc.end();
