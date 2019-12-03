@@ -18,7 +18,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       .toUpperCase();
 
   //Local para salvar o PDF
-  res.setHeader("Content-disposition", 'attachment; filename="' + "teste.pdf" + '"');
+  res.setHeader("Content-disposition", 'attachment; filename="' + usuario.nome + moment().format("MM[_]YYYY") + ".pdf" + '"');
   res.setHeader("Content-type", "application/pdf");
   doc.pipe(res);
 
@@ -119,9 +119,9 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       doc.fill("#000000");
       doc.text(item.data, { continued: true, align: "left" });
       if (item.lucro >= 0) {
-        doc.text("R$ " + item.lucro, { continued: true, align: "right" }).fill("green");
+        doc.text(cf.format(item.lucro, { code: "BRL" }), { continued: true, align: "right" }).fill("green");
       } else {
-        doc.text("R$ " + item.lucro, { continued: true, align: "right" }).fill("red");
+        doc.text(cf.format(item.lucro, { code: "BRL" }), { continued: true, align: "right" }).fill("red");
       }
       doc.fill("#000000");
       doc.text(item.mercado, { lineBreak: true, align: "justify" });
