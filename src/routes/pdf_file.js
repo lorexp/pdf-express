@@ -172,17 +172,13 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.rect(20, 230, doc.page.width - 40, doc.page.height - 270).fillAndStroke("#ffffff", "#D1AC00");
 
   //Grafico Rentabilidade
-  doc.image(chartP, 50, 250, {
-    fit: [500, 400]
-  });
+  doc.image(chartP, 110, 250, { width: 350, height: 250 });
 
   //Faixa abaixo do primeiro grafico
   doc.rect(50, 510, doc.page.width - 100, 0.5).fillAndStroke("#D1AC00", "#D1AC00");
 
   //Grafico ROI
-  doc.image(chartR, 50, 550, {
-    fit: [500, 400]
-  });
+  doc.image(chartR, 110, 550, { width: 350, height: 250 });
 
   // Criação da quarta página
   qtd_pages = saques.length / 10;
