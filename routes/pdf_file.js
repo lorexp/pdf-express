@@ -4,6 +4,10 @@ const cf = require("currency-formatter");
 const moment = require("moment");
 require("moment/locale/pt-br");
 
+//Load the images path
+const preta = path.resolve("./images/preta.png");
+const ethereum = path.resolve("./images/ethereum.png");
+
 function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   const doc = new PDFDocument({
     size: "A4"
@@ -28,7 +32,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.pipe(res);
 
   //Adicionando a imagem no topo da página
-  doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+  doc.image(preta, 145, 0, {
     fit: [320, 320]
   });
 
@@ -122,7 +126,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
     }
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
-    doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+    doc.image(preta, 145, 0, {
       fit: [320, 320]
     });
 
@@ -182,7 +186,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
 
   doc.addPage();
   //Adicionando a imagem no topo da página
-  doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+  doc.image(preta, 145, 0, {
     fit: [320, 320]
   });
 
@@ -225,7 +229,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
     }
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
-    doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+    doc.image(preta, 145, 0, {
       fit: [320, 320]
     });
 
@@ -283,7 +287,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   // if (saques.length > 0) {
   //   doc.addPage();
   //   //Adicionando a imagem no centro e topo da página
-  //   doc.image(path.resolve("./src/" + "preta.png"), 145, 0, {
+  //   doc.image(preta, 145, 0, {
   //     fit: [320, 320]
   //   });
 
@@ -333,7 +337,16 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.end();
 }
 
-function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
+function pdf_ethereum(
+  res,
+  capital,
+  saques,
+  usuario,
+  chartP,
+  chartR,
+  cotacaoEth,
+  moedas_mes
+) {
   const doc = new PDFDocument({
     size: "A4"
   });
@@ -357,7 +370,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
   doc.pipe(res);
 
   //Adicionando a imagem no topo da página
-  doc.image(path.resolve("./src/preta.png"), 145, 0, {
+  doc.image(preta, 145, 0, {
     fit: [320, 320]
   });
 
@@ -395,18 +408,27 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
   //Lucro mensal
   doc.fontSize(24);
   doc.moveDown(1);
-  if (capital.p_mensal >= 0) {
-    doc.fillColor("green").text(capital.p_mensal + "%", { align: "center" });
+  let p_mensal = Number(
+    (((moedas_mes * cotacaoEth) / capital.inicial) * 100).toFixed(2)
+  );
+  if (p_mensal >= 0) {
+    doc.fillColor("green").text(p_mensal + "%", { align: "center" });
   } else {
-    doc.fillColor("red").text(capital.p_mensal + "%", { align: "center" });
+    doc.fillColor("red").text(p_mensal + "%", { align: "center" });
   }
 
   doc.moveDown(0.2);
   doc.fill("#000000");
   doc.fontSize(48);
-  doc.text(cf.format(capital.lucro_mensal, { code: "BRL" }), {
-    align: "center"
-  }); //130, 450
+  // console.log(moedas_mes);
+  doc.text(
+    cf.format(moedas_mes * cotacaoEth, {
+      code: "BRL"
+    }),
+    {
+      align: "center"
+    }
+  ); //130, 450
   doc.fontSize(14);
   doc.moveDown(0.5);
   doc.text("LUCRO MENSAL", { align: "center" });
@@ -414,36 +436,29 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
 
   //Capital + Lucro
   doc.fontSize(24);
-  doc.moveDown(1);
-  if (capital.p_lucro_capital >= 0) {
-    doc
-      .fillColor("green")
-      .text(capital.p_lucro_capital + "%", { align: "center" });
-  } else {
-    doc
-      .fillColor("red")
-      .text(capital.p_lucro_capital + "%", { align: "center" });
-  }
+  doc.moveDown(2);
   doc.fill("#000000");
   doc.fontSize(48);
   doc.moveDown(0.2);
-  doc.image(path.resolve("./src/ethereum.png"), 90, 575, {
-    fit: [60, 60]
+  doc.image(ethereum, 405, 635, {
+    fit: [40, 40]
   });
-  doc.text(cf.format(capital.lucro_capital, { code: "BRL" }), {
+  doc.text(moedas_mes, {
     align: "center"
   }); //130, 450
   doc.fontSize(14);
   doc.moveDown(0.5);
-  doc.text("MOEDA MINERADA ETHEREUM", { align: "center" });
+  doc.text("MOEDAS MINERADAS ETHEREUM", { align: "center" });
 
   //incluindo os gráficos no pdf - terceira página
 
   doc.addPage();
   //Adicionando a imagem no topo da página
-  doc.image(path.resolve("./src/preta.png"), 145, 0, {
+  doc.image(preta, 145, 0, {
     fit: [320, 320]
   });
+
+  doc.text("");
 
   //Retângulo dourado com o mês de fechamento
   doc.rect(0, 180, doc.page.width, 30).fill("#D1AC00");
@@ -458,7 +473,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
     .fillAndStroke("#ffffff", "#D1AC00");
 
   //Grafico Rentabilidade
-  // doc.image(chartP, 110, 250, { width: 350, height: 250 });
+  doc.image(chartP, 110, 250, { width: 350, height: 250 });
 
   //Faixa abaixo do primeiro grafico
   doc
@@ -466,7 +481,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
     .fillAndStroke("#D1AC00", "#D1AC00");
 
   //Grafico ROI
-  // doc.image(chartR, 110, 550, { width: 350, height: 250 });
+  doc.image(chartR, 110, 550, { width: 350, height: 250 });
 
   // Criação da quarta página
   qtd_pages = saques.length / 10;
@@ -484,7 +499,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
     }
     doc.addPage();
     //Adicionando a imagem no centro e topo da página
-    doc.image(path.resolve("./src/preta.png"), 145, 0, {
+    doc.image(preta, 145, 0, {
       fit: [320, 320]
     });
 
@@ -502,14 +517,14 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
 
     doc.fill("#000000");
     doc.moveDown(2);
-    doc.text("SAQUES/APLICAÇÕES", { align: "center" });
+    doc.text("SAQUES/FECHAMENTOS", { align: "center" });
     //Itens do array
     doc.fontSize(14);
     doc.moveDown(1.5);
 
     doc.text("DATA", { align: "left", continued: true });
     doc.text("SAQUES", 270, 325, { width: 20, continued: true });
-    doc.text("APLICAÇÃO", 360, 325, { lineBreak: true });
+    doc.text("FECHAMENTOS", 360, 325, { lineBreak: true });
 
     doc.moveDown(1.5);
 
@@ -521,7 +536,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
         continued: true,
         align: "center"
       });
-      doc.text(cf.format(saques[x].aplicacao, { code: "BRL" }), {
+      doc.text(saques[x].aplicacao + " Moedas", {
         lineBreak: true,
         align: "right"
       });
@@ -543,7 +558,7 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
   //Ultima página
   doc.addPage();
 
-  doc.image(path.resolve("./src/preta.png"), 145, 0, {
+  doc.image(preta, 145, 0, {
     fit: [320, 320]
   });
 
@@ -565,12 +580,13 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
   doc.moveDown(2);
   doc.text("TOTAL EM MOEDAS ETHEREUM", { align: "center" });
   doc.moveDown(2.5);
-  doc.image(path.resolve("./src/ethereum.png"), 170, 320, {
-    fit: [60, 60]
+  doc.image(ethereum, 430, 245, {
+    fit: [40, 40]
   });
   doc.fill("#000000");
   doc.fontSize(48);
-  doc.text(capital.moedas, {
+  console.log(capital);
+  doc.text(capital.total_moedas, {
     align: "center"
   }); //130, 450
   doc.rect(75, 415, doc.page.width - 150, 5).fill("#D1AC00");
@@ -578,35 +594,34 @@ function pdf_ethereum(res, capital, saques, usuario, chartP, chartR) {
   //Capital + Lucro
   doc.fontSize(24);
   doc.moveDown(2);
-  if (capital.p_lucro_mensal_total >= 0) {
-    doc
-      .fillColor("green")
-      .text(capital.p_lucro_mensal_total + "%", { align: "center" });
+  let p_venda_moeda = Number(
+    (((capital.total_moedas * cotacaoEth) / capital.inicial) * 100).toFixed(2)
+  );
+  if (p_venda_moeda >= 0) {
+    doc.fillColor("green").text(p_venda_moeda + "%", { align: "center" });
   } else {
-    doc
-      .fillColor("red")
-      .text(capital.p_lucro_mensal_total + "%", { align: "center" });
+    doc.fillColor("red").text(p_venda_moeda + "%", { align: "center" });
   }
   doc.fill("#000000");
   doc.fontSize(48);
   doc.moveDown(0.2);
-  doc.text(cf.format(capital.lucro_mensal_total, { code: "BRL" }), {
-    align: "center"
-  }); //130, 450
-  doc.fontSize(14);
-  doc.moveDown(0.5);
-  doc.text("LUCRO MENSAL TOTAL", { align: "center" });
-  doc.rect(75, 585, doc.page.width - 150, 5).fill("#D1AC00");
-
-  doc.moveDown(4);
-  doc.fill("#000000");
-  doc.fontSize(48);
-  doc.text(cf.format(capital.moedas * capital.cotacao, { code: "BRL" }), {
+  doc.text(cf.format(capital.total_moedas * cotacaoEth, { code: "BRL" }), {
     align: "center"
   }); //130, 450
   doc.fontSize(14);
   doc.moveDown(0.5);
   doc.text("VALOR TOTAL PARA VENDA HOJE", { align: "center" });
+  doc.rect(75, 585, doc.page.width - 150, 5).fill("#D1AC00");
+
+  doc.moveDown(4);
+  doc.fill("#000000");
+  doc.fontSize(48);
+  doc.text(cf.format(cotacaoEth, { code: "BRL" }), {
+    align: "center"
+  }); //130, 450
+  doc.fontSize(14);
+  doc.moveDown(0.5);
+  doc.text("COTAÇÃO DO ETHEREUM", { align: "center" });
 
   // Finalize PDF file
   doc.end();

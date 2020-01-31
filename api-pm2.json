@@ -2,7 +2,7 @@
   "apps" : [
     {
       "name"        : "pdf-express",
-      "script"      : "./src/server.js",
+      "script"      : "./index.js",
       "env": {
         "TZ": "America/Sao_Paulo"
       },
