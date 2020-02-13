@@ -8,14 +8,26 @@ require("moment/locale/pt-br");
 const preta = path.resolve("./images/preta.png");
 const ethereum = path.resolve("./images/ethereum.png");
 
-function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
+function pdf_generator(
+  res,
+  capital,
+  lucros,
+  saques,
+  usuario,
+  chartP,
+  chartR,
+  data
+) {
   const doc = new PDFDocument({
     size: "A4"
   });
 
+  let codigoMoeda =
+    capital.moeda === "$" ? "USD" : capital.moeda === "R$" ? "BRL" : "EUR";
+
   const fechamento =
     "FECHAMENTO " +
-    moment()
+    moment(data)
       .format("MMMM YYYY")
       .toUpperCase();
 
@@ -61,7 +73,9 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.text("CAPITAL", { align: "center" });
   doc.fontSize(48);
   doc.moveDown(0.5);
-  doc.text(cf.format(capital.inicial, { code: "BRL" }), { align: "center" }); //130, 300
+  doc.text(cf.format(capital.inicial, { code: codigoMoeda }), {
+    align: "center"
+  }); //130, 300
   doc.fontSize(14);
   doc.moveDown(0.5);
   doc.text("CAPITAL INICIAL", { align: "center" }); //240, 360
@@ -79,7 +93,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.moveDown(0.2);
   doc.fill("#000000");
   doc.fontSize(48);
-  doc.text(cf.format(capital.lucro_mensal, { code: "BRL" }), {
+  doc.text(cf.format(capital.lucro_mensal, { code: codigoMoeda }), {
     align: "center"
   }); //130, 450
   doc.fontSize(14);
@@ -102,7 +116,7 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
   doc.fill("#000000");
   doc.fontSize(48);
   doc.moveDown(0.2);
-  doc.text(cf.format(capital.lucro_capital, { code: "BRL" }), {
+  doc.text(cf.format(capital.lucro_capital, { code: codigoMoeda }), {
     align: "center"
   }); //130, 450
   doc.fontSize(14);
@@ -155,15 +169,17 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       if (lucros[x].lucro >= 0) {
         doc
           .fillColor("green")
-          .text(cf.format(lucros[x].lucro, { code: "BRL" }), {
+          .text(cf.format(lucros[x].lucro, { code: codigoMoeda }), {
             continued: true,
             align: "right"
           });
       } else {
-        doc.fillColor("red").text(cf.format(lucros[x].lucro, { code: "BRL" }), {
-          continued: true,
-          align: "right"
-        });
+        doc
+          .fillColor("red")
+          .text(cf.format(lucros[x].lucro, { code: codigoMoeda }), {
+            continued: true,
+            align: "right"
+          });
       }
       doc.fill("#000000");
       doc.text(lucros[x].mercado, { lineBreak: true, align: "justify" });
@@ -262,11 +278,11 @@ function pdf_generator(res, capital, lucros, saques, usuario, chartP, chartR) {
       doc.fontSize(14);
       doc.fill("#000000");
       doc.text(saques[x].data, { continued: true, align: "left" });
-      doc.text(cf.format(saques[x].saque, { code: "BRL" }), {
+      doc.text(cf.format(saques[x].saque, { code: codigoMoeda }), {
         continued: true,
         align: "center"
       });
-      doc.text(cf.format(saques[x].aplicacao, { code: "BRL" }), {
+      doc.text(cf.format(saques[x].aplicacao, { code: codigoMoeda }), {
         lineBreak: true,
         align: "right"
       });
@@ -345,15 +361,19 @@ function pdf_ethereum(
   chartP,
   chartR,
   cotacaoEth,
-  moedas_mes
+  moedas_mes,
+  data
 ) {
   const doc = new PDFDocument({
     size: "A4"
   });
 
+  let codigoMoeda =
+    capital.moeda === "$" ? "USD" : capital.moeda === "R$" ? "BRL" : "EUR";
+
   const fechamento =
     "FECHAMENTO " +
-    moment()
+    moment(data)
       .format("MMMM YYYY")
       .toUpperCase();
 
@@ -399,7 +419,9 @@ function pdf_ethereum(
   doc.text("CAPITAL", { align: "center" });
   doc.fontSize(48);
   doc.moveDown(0.5);
-  doc.text(cf.format(capital.inicial, { code: "BRL" }), { align: "center" }); //130, 300
+  doc.text(cf.format(capital.inicial, { code: codigoMoeda }), {
+    align: "center"
+  }); //130, 300
   doc.fontSize(14);
   doc.moveDown(0.5);
   doc.text("CAPITAL INICIAL", { align: "center" }); //240, 360
@@ -423,7 +445,7 @@ function pdf_ethereum(
   // console.log(moedas_mes);
   doc.text(
     cf.format(moedas_mes * cotacaoEth, {
-      code: "BRL"
+      code: codigoMoeda
     }),
     {
       align: "center"
@@ -532,7 +554,7 @@ function pdf_ethereum(
       doc.fontSize(14);
       doc.fill("#000000");
       doc.text(saques[x].data, { continued: true, align: "left" });
-      doc.text(cf.format(saques[x].saque, { code: "BRL" }), {
+      doc.text(cf.format(saques[x].saque, { code: codigoMoeda }), {
         continued: true,
         align: "center"
       });
@@ -605,9 +627,12 @@ function pdf_ethereum(
   doc.fill("#000000");
   doc.fontSize(48);
   doc.moveDown(0.2);
-  doc.text(cf.format(capital.total_moedas * cotacaoEth, { code: "BRL" }), {
-    align: "center"
-  }); //130, 450
+  doc.text(
+    cf.format(capital.total_moedas * cotacaoEth, { code: codigoMoeda }),
+    {
+      align: "center"
+    }
+  ); //130, 450
   doc.fontSize(14);
   doc.moveDown(0.5);
   doc.text("VALOR TOTAL PARA VENDA HOJE", { align: "center" });
@@ -616,7 +641,7 @@ function pdf_ethereum(
   doc.moveDown(4);
   doc.fill("#000000");
   doc.fontSize(48);
-  doc.text(cf.format(cotacaoEth, { code: "BRL" }), {
+  doc.text(cf.format(cotacaoEth, { code: codigoMoeda }), {
     align: "center"
   }); //130, 450
   doc.fontSize(14);
